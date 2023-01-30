@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Plat;
 use App\Form\PlatType;
 use App\Repository\PlatRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,8 +22,12 @@ class PlatController extends AbstractController
      * @param Request $request
      * @return Response
      */
-    #[Route('/plat', name: 'app_plat', methods: ['GET'])]
-    public function index(PlatRepository $repository, PaginatorInterface $paginator, Request $request): Response
+    #[Route('/plat', name: 'plat_index', methods: ['GET'])]
+    public function index(
+        PlatRepository $repository, 
+        PaginatorInterface $paginator, 
+        Request $request
+        ): Response
     {
         $plats = $paginator->paginate(
             $repository->findAll(),
@@ -36,11 +41,33 @@ class PlatController extends AbstractController
         ]);
     }
     #[Route('/nouveau', 'plat.new', methods: ['GET', 'POST'])]
-    public function new(): Response
+    public function new(
+        Request $request,
+        EntityManagerInterface $manager
+        ): Response
     {
 
         $plat = new Plat();
         $form = $this->createForm(PlatType::class, $plat);
+
+        $form->handleRequest($request);
+        
+        if($form->isSubmitted() && $form->isValid()) {
+            $plat = $form->getData();
+
+            $manager->persist($plat);
+            $manager->flush();
+
+            $this->addFlash(
+                'success',
+                'Votre plat a été créer avec succès !'
+            );
+        } else {
+            $this->addFlash(
+                'warning',
+                'Votre plat n\'a pas été créer !'
+            );
+        }
 
         return $this->render('pages/plat/new.html.twig', [
             'form' => $form->createView()
