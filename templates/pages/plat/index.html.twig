@@ -27,15 +27,18 @@
 						<h4 class="card-title">{{plat.name}}</h4>
 						<h4 class="card-price">{{plat.price}}€</h4>
 						<p class="card-text">{{plat.description}}</p>
+
 					</div>
+					<a href="{{ path('plat.delete', {id: plat.id}) }}" class="btn btn-danger">supprimer</a>
+					<a href="{{ path('plat.edit', {id: plat.id}) }}" class="btn btn-warning">modifier</a>
 				</div>
 			{% endfor %}
 			<div class="navigation d-flex justify-content-center mt-4">
 				{{ knp_pagination_render(plats) }}
 			</div>
 		</div>
-		{% endif %}
-					<a href="{{ path('plat.new')}}" class="btn btn-primary">
-				créer un plat
-			</a>
-	{% endblock %}
+	{% endif %}
+	<a href="{{ path('plat.new')}}" class="btn btn-primary">
+		créer un plat
+	</a>
+{% endblock %}

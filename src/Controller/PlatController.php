@@ -75,6 +75,7 @@ class PlatController extends AbstractController
                 'warning',
                 'Votre plat n\'a pas été créer !'
             );
+            
         }
 
         return $this->render('pages/plat/new.html.twig', [
@@ -107,10 +108,31 @@ class PlatController extends AbstractController
                 'warning',
                 'Votre plat n\'a pas été créer !'
             );
+            
         }
 
         return $this->render('pages/plat/edit.html.twig', [
             'form' => $form->createView()
         ]);
+    }
+    #[Route('/plat/suppression/{id}', 'plat.delete', methods: ['GET'])]
+    public function delete(EntityManagerInterface $manager, Plat $plat) : Response
+    {
+        if(!$plat) {
+            $this->addFlash(
+                'warning',
+                'Votre plat n\a pas été trouvé !'
+               );
+        }
+       $manager->remove($plat);
+       $manager->flush();
+
+       $this->addFlash(
+        'success',
+        'Votre plat a été supprimé avec succès !'
+       );
+
+       return $this->redirectToRoute('plat_index');
+       
     }
 }
