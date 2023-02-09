@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Plat;
 use App\Form\PlatType;
 use App\Repository\PlatRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 class PlatController extends AbstractController
 {
     /**
-     * This function display all plat
+     * This controller display all plat
      *
      * @param PlatRepository $repository
      * @param PaginatorInterface $paginator
@@ -40,6 +41,13 @@ class PlatController extends AbstractController
 
         ]);
     }
+    /**
+     * This controller show a form which create an plat
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $manager
+     * @return Response
+     */
     #[Route('/nouveau', 'plat.new', methods: ['GET', 'POST'])]
     public function new(
         Request $request,
@@ -70,6 +78,38 @@ class PlatController extends AbstractController
         }
 
         return $this->render('pages/plat/new.html.twig', [
+            'form' => $form->createView()
+        ]);
+    }
+
+    #[Route('/plat/edition/{id}', 'plat.edit', methods: ['GET', 'POST'])]
+    public function edit(
+        Plat $plat,
+        Request $request,
+        EntityManagerInterface $manager
+     ) : Response
+    {   
+        $form = $this->createForm(PlatType::class, $plat);
+        $form->handleRequest($request);
+        
+        if($form->isSubmitted() && $form->isValid()) {
+            $plat = $form->getData();
+
+            $manager->persist($plat);
+            $manager->flush();
+
+            $this->addFlash(
+                'success',
+                'Votre plat a été modifié avec succès !'
+            );
+        } else {
+            $this->addFlash(
+                'warning',
+                'Votre plat n\'a pas été créer !'
+            );
+        }
+
+        return $this->render('pages/plat/edit.html.twig', [
             'form' => $form->createView()
         ]);
     }

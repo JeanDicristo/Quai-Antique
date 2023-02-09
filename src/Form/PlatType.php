@@ -50,6 +50,7 @@ class PlatType extends AbstractType
                 ]
             ])
             ->add('image', FileType::class, [
+                'data_class' => null,
                 'attr' => [
                     'class' => 'form-control'
                 ],
