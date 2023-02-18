@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter un menu
+{% endblock %}
+
+{% block body %}
+	<div
+		{% if not plats.items is same as([]) %}
+			<h1>mes menu</h1>
+
+			{% for menu in menus %}
+				<div class="card text-white bg-primary mb-3 mt-4" style="max-width: 20rem;">
+					<div class="card-body">
+						<h4 class="card-title">{{menu.name}}</h4>
+						<h4 class="card-price">{{menu.price}}€</h4>
+                        <h4 class="card-price">{{menu.formule}}€</h4>
+						<p class="card-text">{{menu.description}}</p>
+
+					</div>
+					<a href="{{ path('menu.delete', {id: menu.id}) }}" class="btn btn-danger">todo</a>
+					<a href="{{ path('menu.edit', {id: menu.id}) }}" class="btn btn-warning">todo</a>
+				</div>
+			{% endfor %}
+			<div class="navigation d-flex justify-content-center mt-4">
+				{{ knp_pagination_render(menus) }}
+			</div>
+		</div>
+	{% endif %}
+	<a href="{{ path('plat.new')}}" class="btn btn-primary">
+		créer un menu
+	</a>
+{% endblock %}

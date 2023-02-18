@@ -2,40 +2,47 @@
 
 namespace App\Entity;
 
-use App\Repository\PlatRepository;
+use App\Repository\MenuRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
-
-#[ORM\Entity(repositoryClass: PlatRepository::class)]
 #[UniqueEntity('name')]
-class Plat
+#[ORM\Entity(repositoryClass: MenuRepository::class)]
+class Menu
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 70)]
-    #[Assert\Length(min: 0, max: 70)]
+    #[ORM\Column(length: 60)]
+    #[Assert\Length(min: 0, max: 60)]
     #[Assert\NotBlank()]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::FLOAT)]
+    #[ORM\Column]
+    #[Assert\Positive()]
+    private ?int $formule = null;
+
+    #[ORM\Column]
     #[Assert\LessThan(1001)]
     #[Assert\Positive()]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank()]
     private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $Image = null;
+    #[ORM\ManyToMany(targetEntity: Plat::class)]
+    private Collection $plat;
 
-    #[ORM\Column]
-    private ?int $category = null;
-
+    public function __construct()
+    {
+        $this->plat = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -50,6 +57,18 @@ class Plat
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getFormule(): ?int
+    {
+        return $this->formule;
+    }
+
+    public function setFormule(int $formule): self
+    {
+        $this->formule = $formule;
 
         return $this;
     }
@@ -78,26 +97,26 @@ class Plat
         return $this;
     }
 
-    public function getImage(): ?string
+    /**
+     * @return Collection<int, Plat>
+     */
+    public function getPlat(): Collection
     {
-        return $this->Image;
+        return $this->plat;
     }
 
-    public function setImage(string $Image): self
+    public function addPlat(Plat $plat): self
     {
-        $this->Image = $Image;
+        if (!$this->plat->contains($plat)) {
+            $this->plat->add($plat);
+        }
 
         return $this;
     }
 
-    public function getCategory(): ?int
+    public function removePlat(Plat $plat): self
     {
-        return $this->category;
-    }
-
-    public function setCategory(int $category): self
-    {
-        $this->category = $category;
+        $this->plat->removeElement($plat);
 
         return $this;
     }

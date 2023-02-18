@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Plat;
+use App\Entity\Menu;
 use Faker\Factory;
 use Faker\Generator;
 use Doctrine\Persistence\ObjectManager;
@@ -21,14 +22,32 @@ class AppFixtures extends Fixture
     }
     public function load(ObjectManager $manager): void
     {
+        // Plat
+        $plats = [];
         for ($i = 0; $i < 50; $i++) {
             $plat = new Plat();
             $plat->setName($this->faker->word())
                 ->setPrice(mt_rand(0, 30))
-                ->setDescription('hamburger specialité de saavoie')
-                ->setImage('https://img.passeportsante.net/1000x526/2021-03-16/i100351-hamburger-maison.jpeg');
+                ->setDescription($this->faker->text(200))
+                ->setImage('https://img.passeportsante.net/1000x526/2021-03-16/i100351-hamburger-maison.jpeg')
+                ->setCategory(mt_rand(0, 30));
 
+            $plats[] = $plat;
             $manager->persist($plat);
+        }
+
+        // Menu
+        for ($j=0; $j < 10; $j++) { 
+            $menu = new Menu();
+            $menu->setName($this->faker->word())
+            ->setFormule(mt_rand(0, 30))
+            ->setPrice(mt_rand(0, 30))
+            ->setDescription($this->faker->text(200));
+
+            for ($k=0; $k < mt_rand(5, 20); $k++) { 
+                $menu->addPlat($plats[mt_rand(0, count($plats) - 1)]);
+            }
+            $manager->persist($menu);
         }
 
         $manager->flush();
